@@ -62,11 +62,18 @@ def init_fed(args):
     num_classes = data.num_classes
 
     # create sub graph for each client
-    client_edge_num = len(data.edge_type) // args.num_client
-    edge_num_list = [client_edge_num] * args.num_client
-    if client_edge_num * args.num_client != len(data.edge_type):
-        edge_num_list[0] = client_edge_num + len(data.edge_type) - client_edge_num * args.num_client
-    edge_perms = random_split(range(len(data.edge_type)), edge_num_list)
+    # A. Extract the subgraph
+    # client_edge_num = len(data.edge_type) // args.num_client
+    # edge_num_list = [client_edge_num] * args.num_client
+    # if client_edge_num * args.num_client != len(data.edge_type):
+    #     edge_num_list[0] = client_edge_num + len(data.edge_type) - client_edge_num * args.num_client
+    # edge_perms = random_split(range(len(data.edge_type)), edge_num_list)
+
+    # B. Extract the subgraph
+    edge_perms = []
+    for _ in range(args.num_client):
+        perm = np.random.permutation(len(data.edge_type))[:int(len(data.edge_type)*args.labeled_rate)]
+        edge_perms.append(perm)
 
     datasets = []
     for perm in edge_perms:
